@@ -1,0 +1,6 @@
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "python health_monitor.py"
+restartPolicy = "ON_FAILURE"

@@ -2,8 +2,8 @@ name: HudsonSeed Health Monitor
 
 on:
   schedule:
-    - cron: '0 */4 * * *'   # Every 4 hours
-  workflow_dispatch:        # Run manually if needed
+    - cron: '0 */4 * * *'
+  workflow_dispatch:
 
 jobs:
   health-check:

@@ -1,28 +1,26 @@
-import os
-import requests
-import json
-from datetime import datetime
-from supabase import create_client
+name: HudsonSeed Health Monitor
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-SLACK_WEBHOOK = os.getenv("SLACK_WEBHOOK")
+on:
+  schedule:
+    - cron: '0 */4 * * *'
+  workflow_dispatch:
 
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-def log_run(status, message):
-    supabase.table("agent_runs").upsert({
-        "timestamp": datetime.utcnow().isoformat(),
-        "service": "health_monitor",
-        "status": status,
-        "message": message
-    }).execute()
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
-def main():
-    print(f"{datetime.utcnow()} - HudsonSeed Health Monitor RUNNING")
-    log_run("OK", "Health check passed - 9 APIs reachable")
-    if SLACK_WEBHOOK:
-        requests.post(SLACK_WEBHOOK, json={"text": "✅ HudsonSeed Monitor: All systems nominal"})
+      - name: Install dependencies
+        run: pip install supabase requests
 
-if __name__ == "__main__":
-    main()
+      - name: Run Health Monitor
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python health_monitor.py

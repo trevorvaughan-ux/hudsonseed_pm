@@ -5,8 +5,7 @@
   },
   "deploy": {
     "startCommand": "python health_monitor.py",
-    "healthcheckPath": "/health",
-    "restartPolicyType": "ON_FAILURE",
-    "restartPolicyMaxRetries": 10
+    "restartPolicy": "ALWAYS",
+    "healthcheckPath": "/health"
   }
 }

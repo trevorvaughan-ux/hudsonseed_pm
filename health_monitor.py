@@ -17,6 +17,8 @@ SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 SLACK_WEBHOOK = os.getenv("SLACK_WEBHOOK")  # optional
 LOOP_MODE = os.getenv("LOOP_MODE", "false").lower() == "true"
 LOOP_INTERVAL_SEC = int(os.getenv("LOOP_INTERVAL_SEC", "300"))  # 5 min default
+RAILWAY_SERVICE_ID = os.getenv("RAILWAY_SERVICE_ID")  # for better logging
+
 
 def fail_fast_if_missing_env():
     missing = []
@@ -35,13 +37,15 @@ def log_run(supabase, status: str, message: str):
             "service": "health_monitor",
             "status": status,
             "message": message,
+            "railway_service_id": RAILWAY_SERVICE_ID
         }).execute()
     except Exception as e:
         print(f"WARN: failed to write to agent_runs: {e}", file=sys.stderr)
 
 def check_supabase_reachable(supabase) -> bool:
     try:
-        supabase.table("agent_runs").select("id").limit(1).execute()
+        result = supabase.table("agent_runs").select("id").limit(1).execute()
+        print(f"Supabase check OK: {len(result.data)} records")
         return True
     except Exception as e:
         print(f"Supabase reachability check failed: {e}", file=sys.stderr)

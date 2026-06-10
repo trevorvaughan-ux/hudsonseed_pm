@@ -1,9 +1,12 @@
 name: HudsonSeed Health Monitor
 
+# DISABLED 2026-06-10 - redundant with Railway loop (runs every 5min)
+# Railway is the live monitor. This was firing 6x/day with missing secrets = noise.
+# Re-enable by adding schedule back and setting SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY
+# in repo Settings > Secrets > Actions.
+
 on:
-  schedule:
-    - cron: '0 */4 * * *'
-  workflow_dispatch:
+  workflow_dispatch:  # manual trigger only
 
 jobs:
   health-check:
